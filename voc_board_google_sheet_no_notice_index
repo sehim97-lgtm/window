@@ -1,1 +1,624 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>주차별 VOC 게시판</title>
 
+<style>
+:root{
+  --navy:#0B1F4D;
+  --blue:#0B5FA5;
+  --sky:#EAF3FF;
+  --line:#D8E2EF;
+  --gray:#F5F7FA;
+  --text:#1F2937;
+  --muted:#6B7280;
+}
+
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  background:#F3F6FB;
+  font-family:"Noto Sans KR","Noto Sans CJK KR","Malgun Gothic",Arial,sans-serif;
+  color:var(--text);
+}
+
+header{
+  background:linear-gradient(135deg,#0B1F4D,#0B5FA5);
+  color:white;
+  padding:42px 56px;
+}
+
+header h1{
+  margin:0;
+  font-size:36px;
+  letter-spacing:-0.04em;
+}
+
+header p{
+  margin:12px 0 0;
+  color:#DCEEFF;
+  font-size:17px;
+}
+
+.wrap{
+  max-width:1180px;
+  margin:34px auto;
+  padding:0 24px 60px;
+}
+
+.section-title{
+  font-size:24px;
+  color:var(--navy);
+  margin:0 0 18px;
+  letter-spacing:-0.03em;
+}
+
+.month-grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:18px;
+}
+
+.month-card{
+  background:white;
+  border:1px solid var(--line);
+  border-radius:20px;
+  padding:26px 24px;
+  cursor:pointer;
+  box-shadow:0 8px 20px rgba(16,47,91,.06);
+  transition:.18s;
+}
+
+.month-card:hover{
+  transform:translateY(-3px);
+  border-color:var(--blue);
+  box-shadow:0 12px 28px rgba(16,47,91,.13);
+}
+
+.month-card strong{
+  display:block;
+  color:var(--navy);
+  font-size:28px;
+}
+
+.month-card span{
+  display:block;
+  margin-top:8px;
+  color:var(--muted);
+  font-size:14px;
+}
+
+.month-card .count{
+  display:inline-block;
+  margin-top:14px;
+  background:var(--sky);
+  color:var(--blue);
+  border-radius:999px;
+  padding:6px 10px;
+  font-size:13px;
+  font-weight:800;
+}
+
+.view{
+  display:none;
+}
+
+.view.active{
+  display:block;
+}
+
+.back-btn{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  border:0;
+  background:var(--navy);
+  color:white;
+  padding:11px 16px;
+  border-radius:999px;
+  cursor:pointer;
+  font-weight:700;
+  margin-bottom:22px;
+}
+
+.month-header{
+  background:white;
+  border:1px solid var(--line);
+  border-radius:22px;
+  padding:26px 30px;
+  margin-bottom:22px;
+  box-shadow:0 8px 20px rgba(16,47,91,.06);
+}
+
+.month-header h2{
+  margin:0;
+  color:var(--navy);
+  font-size:30px;
+}
+
+.month-header p{
+  margin:8px 0 0;
+  color:var(--muted);
+}
+
+.week-list{
+  display:grid;
+  gap:18px;
+}
+
+.week-card{
+  background:white;
+  border:1px solid var(--line);
+  border-radius:22px;
+  overflow:hidden;
+  box-shadow:0 8px 20px rgba(16,47,91,.06);
+}
+
+.week-top{
+  display:flex;
+  justify-content:space-between;
+  gap:18px;
+  align-items:center;
+  background:#F8FAFC;
+  border-bottom:1px solid var(--line);
+  padding:18px 24px;
+}
+
+.week-top h3{
+  margin:0;
+  color:var(--navy);
+  font-size:21px;
+  letter-spacing:-0.02em;
+}
+
+.badge{
+  background:var(--sky);
+  color:var(--blue);
+  padding:7px 12px;
+  border-radius:999px;
+  font-size:13px;
+  font-weight:800;
+  white-space:nowrap;
+}
+
+.week-body{
+  padding:22px 24px 24px;
+  display:grid;
+  grid-template-columns:1.2fr 1fr;
+  gap:20px;
+}
+
+.box{
+  background:#FAFCFF;
+  border:1px solid #E5EDF7;
+  border-radius:16px;
+  padding:18px;
+}
+
+.box h4{
+  margin:0 0 10px;
+  color:var(--blue);
+  font-size:16px;
+}
+
+.box ul{
+  margin:0;
+  padding-left:18px;
+}
+
+.box li{
+  margin:6px 0;
+}
+
+.meta{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:10px;
+  margin-top:14px;
+}
+
+.meta div{
+  background:white;
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:12px;
+  text-align:center;
+}
+
+.meta b{
+  display:block;
+  color:var(--blue);
+  font-size:13px;
+}
+
+.meta span{
+  display:block;
+  margin-top:4px;
+  color:var(--navy);
+  font-weight:800;
+}
+
+.link-list{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin-top:14px;
+}
+
+.link-list a{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  text-decoration:none;
+  color:white;
+  background:var(--blue);
+  padding:9px 12px;
+  border-radius:999px;
+  font-size:13px;
+  font-weight:800;
+}
+
+.empty,
+.error{
+  background:white;
+  border:1px dashed var(--line);
+  border-radius:20px;
+  padding:36px;
+  text-align:center;
+  color:var(--muted);
+}
+
+.error{
+  border-color:#FCA5A5;
+  color:#991B1B;
+  background:#FFF7F7;
+}
+
+.loading{
+  background:white;
+  border:1px solid var(--line);
+  border-radius:20px;
+  padding:36px;
+  text-align:center;
+  color:var(--muted);
+}
+
+@media(max-width:900px){
+  header{padding:32px 24px}
+  .month-grid{grid-template-columns:repeat(2,1fr)}
+  .week-body{grid-template-columns:1fr}
+  .meta{grid-template-columns:1fr}
+}
+
+@media(max-width:520px){
+  .month-grid{grid-template-columns:1fr}
+  .week-top{display:block}
+  .badge{display:inline-block;margin-top:10px}
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>주차별 VOC 게시판</h1>
+  <p>월별·주차별 소비자 반응, 핵심 이슈, 브랜드별 시사점을 정리하는 내부 공유 페이지</p>
+</header>
+
+<main class="wrap">
+
+  <!-- 첫 화면: 월 선택 -->
+  <section id="homeView" class="view active">
+    <h2 class="section-title">월 선택</h2>
+    <div id="statusBox" class="loading">Google Sheet 데이터를 불러오는 중입니다.</div>
+    <div class="month-grid" id="monthGrid" style="display:none;"></div>
+  </section>
+
+  <!-- 월별 상세 화면 -->
+  <section id="monthView" class="view">
+    <button class="back-btn" onclick="goHome()">← 월 선택으로 돌아가기</button>
+
+    <div class="month-header">
+      <h2 id="monthTitle">1월 VOC</h2>
+      <p id="monthDesc">주차별 소비자 반응 및 브랜드 이슈 정리</p>
+    </div>
+
+    <div class="week-list" id="weekList"></div>
+  </section>
+
+</main>
+
+<script>
+/*
+  Google Sheet 설정 방법
+
+  1) Google Sheet 첫 행을 아래처럼 만든다.
+     월 | 주차 | 기간 | 제목 | 브랜드 | 주요 VOC | 시사점 | 외부 링크 | 링크 제목
+
+  2) 파일 → 공유 → 웹에 게시 → CSV 형식으로 게시한다.
+
+  3) 아래 SHEET_CSV_URL에 CSV 게시 링크를 넣는다.
+     예:
+     const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-.../pub?gid=0&single=true&output=csv";
+
+  4) 여러 항목은 셀 안에서 세미콜론(;)으로 구분한다.
+     예:
+     브랜드: LX;KCC;현대L&C
+     주요 VOC: 견적 비교 증가; A/S 주체 문의; 무이자 할부 관심
+*/
+
+const SHEET_CSV_URL = "여기에_GOOGLE_SHEET_CSV_게시_링크를_넣으세요";
+
+let vocData = [];
+
+const monthNames = [
+  "1월","2월","3월","4월","5월","6월",
+  "7월","8월","9월","10월","11월","12월"
+];
+
+const monthGrid = document.getElementById("monthGrid");
+const statusBox = document.getElementById("statusBox");
+const homeView = document.getElementById("homeView");
+const monthView = document.getElementById("monthView");
+const monthTitle = document.getElementById("monthTitle");
+const monthDesc = document.getElementById("monthDesc");
+const weekList = document.getElementById("weekList");
+
+function parseCSV(text){
+  const rows = [];
+  let row = [];
+  let cell = "";
+  let inQuotes = false;
+
+  for(let i = 0; i < text.length; i++){
+    const char = text[i];
+    const next = text[i+1];
+
+    if(char === '"' && inQuotes && next === '"'){
+      cell += '"';
+      i++;
+    } else if(char === '"'){
+      inQuotes = !inQuotes;
+    } else if(char === "," && !inQuotes){
+      row.push(cell);
+      cell = "";
+    } else if((char === "\n" || char === "\r") && !inQuotes){
+      if(char === "\r" && next === "\n") i++;
+      row.push(cell);
+      if(row.some(v => v.trim() !== "")) rows.push(row);
+      row = [];
+      cell = "";
+    } else {
+      cell += char;
+    }
+  }
+
+  if(cell || row.length){
+    row.push(cell);
+    if(row.some(v => v.trim() !== "")) rows.push(row);
+  }
+
+  return rows;
+}
+
+function normalizeMonth(value){
+  const raw = String(value || "").trim();
+  const num = raw.replace("월","").trim();
+  return Number(num);
+}
+
+function splitList(value){
+  if(!value) return [];
+  return String(value)
+    .split(/\n|;|ㆍ|\|/g)
+    .map(v => v.trim())
+    .filter(Boolean);
+}
+
+function mapRows(rows){
+  if(rows.length < 2) return [];
+
+  const headers = rows[0].map(h => h.trim());
+  const idx = name => headers.indexOf(name);
+
+  return rows.slice(1).map(r => {
+    const get = name => {
+      const i = idx(name);
+      return i >= 0 ? (r[i] || "").trim() : "";
+    };
+
+    const urls = splitList(get("외부 링크"));
+    const titles = splitList(get("링크 제목"));
+
+    return {
+      month: normalizeMonth(get("월")),
+      week: get("주차"),
+      period: get("기간"),
+      title: get("제목"),
+      brands: splitList(get("브랜드")),
+      voc: splitList(get("주요 VOC")),
+      insight: splitList(get("시사점")),
+      links: urls.map((url, i) => ({
+        url,
+        title: titles[i] || `외부 링크 ${i + 1}`
+      }))
+    };
+  }).filter(item => item.month >= 1 && item.month <= 12);
+}
+
+async function loadData(){
+  if(!SHEET_CSV_URL || SHEET_CSV_URL.includes("여기에_GOOGLE_SHEET")){
+    statusBox.className = "error";
+    statusBox.innerHTML = `
+      <b>Google Sheet CSV 링크가 아직 입력되지 않았습니다.</b><br>
+      index.html 코드의 <code>SHEET_CSV_URL</code> 값을 Google Sheet CSV 게시 링크로 바꿔주세요.
+    `;
+    renderMonths();
+    return;
+  }
+
+  try{
+    const res = await fetch(SHEET_CSV_URL);
+    if(!res.ok) throw new Error("CSV 데이터를 불러오지 못했습니다.");
+
+    const text = await res.text();
+    const rows = parseCSV(text);
+    vocData = mapRows(rows);
+
+    statusBox.style.display = "none";
+    monthGrid.style.display = "grid";
+    renderMonths();
+
+  } catch(err){
+    statusBox.className = "error";
+    statusBox.innerHTML = `
+      <b>데이터 로딩 실패</b><br>
+      Google Sheet가 CSV로 웹 게시되어 있는지 확인해주세요.<br>
+      오류: ${escapeHTML(err.message)}
+    `;
+  }
+}
+
+function renderMonths(){
+  monthGrid.innerHTML = "";
+
+  for(let i=1; i<=12; i++){
+    const count = vocData.filter(item => item.month === i).length;
+
+    const card = document.createElement("div");
+    card.className = "month-card";
+    card.onclick = () => openMonth(i);
+
+    card.innerHTML = `
+      <strong>${i}월</strong>
+      <span>${count > 0 ? "주차별 VOC 확인 가능" : "등록된 VOC 없음"}</span>
+      <div class="count">${count}건</div>
+    `;
+
+    monthGrid.appendChild(card);
+  }
+
+  if(!SHEET_CSV_URL.includes("여기에_GOOGLE_SHEET")){
+    monthGrid.style.display = "grid";
+  }
+}
+
+function openMonth(month){
+  homeView.classList.remove("active");
+  monthView.classList.add("active");
+
+  monthTitle.textContent = `${monthNames[month-1]} VOC`;
+  monthDesc.textContent = `${monthNames[month-1]} 주차별 소비자 반응 및 브랜드 이슈 정리`;
+
+  renderWeeks(month);
+  window.scrollTo({top:0, behavior:"smooth"});
+}
+
+function renderWeeks(month){
+  const data = vocData
+    .filter(item => item.month === month)
+    .sort((a,b) => String(a.week).localeCompare(String(b.week), "ko"));
+
+  weekList.innerHTML = "";
+
+  if(data.length === 0){
+    weekList.innerHTML = `
+      <div class="empty">
+        아직 등록된 주차별 VOC가 없습니다.
+      </div>
+    `;
+    return;
+  }
+
+  data.forEach(item => {
+    const week = document.createElement("article");
+    week.className = "week-card";
+
+    const brands = item.brands.length ? item.brands.join(", ") : "-";
+    const vocList = item.voc.length ? item.voc : ["주요 VOC가 입력되지 않았습니다."];
+    const insightList = item.insight.length ? item.insight : ["시사점이 입력되지 않았습니다."];
+
+    week.innerHTML = `
+      <div class="week-top">
+        <h3>${escapeHTML(item.week || "주차 미입력")} · ${escapeHTML(item.title || "제목 미입력")}</h3>
+        <span class="badge">${escapeHTML(item.period || "기간 미입력")}</span>
+      </div>
+
+      <div class="week-body">
+        <div class="box">
+          <h4>주요 VOC</h4>
+          <ul>
+            ${vocList.map(v => `<li>${escapeHTML(v)}</li>`).join("")}
+          </ul>
+
+          ${renderLinks(item.links)}
+
+          <div class="meta">
+            <div>
+              <b>관련 브랜드</b>
+              <span>${escapeHTML(brands)}</span>
+            </div>
+            <div>
+              <b>VOC 항목</b>
+              <span>${vocList.length}건</span>
+            </div>
+            <div>
+              <b>주요 방향</b>
+              <span>개선 검토</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="box">
+          <h4>시사점 / 대응 방향</h4>
+          <ul>
+            ${insightList.map(v => `<li>${escapeHTML(v)}</li>`).join("")}
+          </ul>
+        </div>
+      </div>
+    `;
+
+    weekList.appendChild(week);
+  });
+}
+
+function renderLinks(links){
+  if(!links || links.length === 0) return "";
+  return `
+    <div class="link-list">
+      ${links.map(link => `
+        <a href="${escapeAttr(link.url)}" target="_blank" rel="noopener noreferrer">
+          🔗 ${escapeHTML(link.title)}
+        </a>
+      `).join("")}
+    </div>
+  `;
+}
+
+function escapeHTML(str){
+  return String(str || "")
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+}
+
+function escapeAttr(str){
+  return String(str || "").replaceAll('"', "%22");
+}
+
+function goHome(){
+  monthView.classList.remove("active");
+  homeView.classList.add("active");
+  window.scrollTo({top:0, behavior:"smooth"});
+}
+
+loadData();
+</script>
+
+</body>
+</html>
