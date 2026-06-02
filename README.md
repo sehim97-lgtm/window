@@ -1,4 +1,3 @@
-[window_brand_case_study.html](https://github.com/user-attachments/files/28506972/window_brand_case_study.html)
 <!doctype html>
 <html lang="ko">
 <head>
